@@ -1,5 +1,5 @@
 const googlethis = require('googlethis');
-const axios = require('axios');
+const axios = require('axios').default;
 
 /**
  * @typedef {Object} SearcherResultItem
