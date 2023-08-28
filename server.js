@@ -2,11 +2,14 @@ const { config: dotenvConfig } = require('dotenv');
 const express = require('express');
 const bodyParser = require('body-parser');
 const http = require('http');
+const cors = require('cors');
 
 dotenvConfig()
 
 const app = express();
 const server = http.createServer(app);
+
+app.use(cors())
 
 app.set('trust proxy', true);
 app.disable('x-powered-by');
