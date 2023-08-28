@@ -1,7 +1,7 @@
 const { config: dotenvConfig } = require('dotenv');
 const { app, server } = require('./server.js');
 const router = require('./apis.js');
-const router = require('cors');
+const cors = require('cors');
 
 app.use(cors())
 
