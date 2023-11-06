@@ -165,9 +165,41 @@ const googleSearchSummary = async (showUrl = true, ...queries) => {
   return summary(await googleSearch(...queries), showUrl);
 }
 
+function googleExtractText($, el, isRoot = false, showUrl = true) {
+  try {
+    const children = $(el).children('*')
+    let href = $(el).prop('href') || undefined
+    if (href && href.startsWith('/search')) throw 'no need'
+    let text = (children.length == 0
+      ? $(el).text()
+      : [...children].map(c => googleExtractText($, c, false, showUrl)).join('\n')).trim()
+    if (href?.startsWith('/url')) href = (qs.parse(href.split('?')[1]) || {}).q || ''
+    else href = undefined
+    return `${showUrl && href ? href + '\n' : ''}${text}`
+  } catch (e) {
+    if (isRoot) return ''
+    else throw e
+  }
+}
+
+const _googleSearchSummaryV2 = async (query, showUrl = true) => {
+  const res = await axios.get(`https://www.google.com/search?q=${query}`)
+  const $ = cheerioLoad(res.data)
+  const items = [...$('#main').children('div')]
+  const text = items.map(i => googleExtractText($, i, true)).join('\n\n').trim()
+    .replace(/(\n{2,})/g, '\n\n').replace(/�/g, '')
+  return text
+
+}
+
+const googleSearchSummaryV2 = async (showUrl=true, ...queries) => {
+  return (await Promise.all(queries.map((query) => _googleSearchSummaryV2(query, showUrl)))).join('\n\n---\n\n')
+}
+
 module.exports = {
   googleSearch,
   ddgSearch,
   googleSearchSummary,
+  googleSearchSummaryV2,
   ddgSearchSummary
 };

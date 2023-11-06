@@ -1,7 +1,7 @@
 const express = require('express');
 const { app } = require('./server');
 const adaptParseBody = require('./utils/adaptParseBody');
-const { ddgSearch, ddgSearchSummary, googleSearch, googleSearchSummary } = require('./search');
+const { ddgSearch, ddgSearchSummary, googleSearch, googleSearchSummary, googleSearchSummaryV2 } = require('./search');
 
 app.use('/', express.static('public/'));
 
@@ -30,10 +30,18 @@ app.use('/ddg-search', async (req, res) => {
 });
 
 app.use('/google-search-summary', async (req, res) => {
-  const { query, showUrl = true } = adaptParseBody(req)
+  const { query, showUrl = true, v } = adaptParseBody(req)
+  if (v == 2) return res.redirect(`/google-search-summary-v2?query=${query}`)
   if (!query) return res.status(400).send({ error: 'Invalid body' })
   res.type('text/plain')
   res.send(await googleSearchSummary(showUrl, query))
+});
+
+app.use('/google-search-summary-v2', async (req, res) => {
+  const { query, showUrl = true } = adaptParseBody(req)
+  if (!query) return res.status(400).send({ error: 'Invalid body' })
+  res.type('text/plain')
+  res.send(await googleSearchSummaryV2(showUrl, query))
 });
 
 app.use('/ddg-search-summary', async (req, res) => {
