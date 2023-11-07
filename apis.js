@@ -30,24 +30,24 @@ app.use('/ddg-search', async (req, res) => {
 });
 
 app.use('/google-search-summary', async (req, res) => {
-  const { query, showUrl = true, v } = adaptParseBody(req)
-  if (v == 2) return res.redirect(`/google-search-summary-v2?query=${query}`)
-  if (!query) return res.status(400).send({ error: 'Invalid body' })
-  res.type('text/plain')
-  res.send(await googleSearchSummary(showUrl, query))
+  const { query, showUrl = true, v = 2 } = adaptParseBody(req);
+  if (!query) return res.status(400).send({ error: 'Invalid body' });
+  res.type('text/plain; charset=utf-8');
+  if (v == 2) res.send(await googleSearchSummaryV2(showUrl, query));
+  else res.send(await googleSearchSummary(showUrl, query));
 });
 
 app.use('/google-search-summary-v2', async (req, res) => {
-  const { query, showUrl = true } = adaptParseBody(req)
-  if (!query) return res.status(400).send({ error: 'Invalid body' })
-  res.type('text/plain')
-  res.send(await googleSearchSummaryV2(showUrl, query))
+  const { query, showUrl = true } = adaptParseBody(req);
+  if (!query) return res.status(400).send({ error: 'Invalid body' });
+  res.type('text/plain; charset=utf-8');
+  res.send(await googleSearchSummaryV2(showUrl, query));
 });
 
 app.use('/ddg-search-summary', async (req, res) => {
   const { query, showUrl = true } = adaptParseBody(req)
   if (!query) return res.status(400).send({ error: 'Invalid body' })
-  res.type('text/plain')
+  res.type('text/plain; charset=utf-8');
   res.send(await ddgSearchSummary(showUrl, query))
 });
 
